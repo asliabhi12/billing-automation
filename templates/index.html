@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Excel Billing Processor</title>
+
+<style>
+
+body{
+    font-family: Arial;
+    background:#f5f6fa;
+    text-align:center;
+    padding-top:80px;
+}
+
+.container{
+    background:white;
+    width:500px;
+    margin:auto;
+    padding:40px;
+    border-radius:10px;
+    box-shadow:0px 5px 20px rgba(0,0,0,0.1);
+}
+
+.drop-area{
+    border:2px dashed #3498db;
+    padding:40px;
+    margin-top:20px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+button{
+    margin-top:20px;
+    padding:12px 30px;
+    background:#3498db;
+    border:none;
+    color:white;
+    font-size:16px;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#2980b9;
+}
+
+.spinner{
+    display:none;
+    margin-top:20px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Excel Billing Processor</h2>
+
+<form method="POST" enctype="multipart/form-data" onsubmit="showSpinner()">
+
+<div class="drop-area">
+<input type="file" name="files" multiple required>
+</div>
+
+<button type="submit">Process Files</button>
+
+<div class="spinner" id="spinner">
+Processing files...
+</div>
+
+</form>
+
+</div>
+
+<script>
+
+function showSpinner(){
+    document.getElementById("spinner").style.display="block";
+}
+
+</script>
+
+</body>
+</html>
