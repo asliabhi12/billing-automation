@@ -60,7 +60,7 @@ button:hover{
 
 <h2>Excel Billing Processor</h2>
 
-<form method="POST" enctype="multipart/form-data" onsubmit="showSpinner()">
+<form id="uploadForm" enctype="multipart/form-data">
 
 <div class="drop-area">
 <input type="file" name="files" multiple required>
@@ -78,9 +78,37 @@ Processing files...
 
 <script>
 
-function showSpinner(){
-    document.getElementById("spinner").style.display="block";
-}
+const form = document.getElementById("uploadForm");
+const spinner = document.getElementById("spinner");
+
+form.addEventListener("submit", async function(e){
+
+    e.preventDefault();
+
+    spinner.style.display = "block";
+
+    const formData = new FormData(form);
+
+    const response = await fetch("/", {
+        method: "POST",
+        body: formData
+    });
+
+    const blob = await response.blob();
+
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "transformed.xlsx";
+    document.body.appendChild(a);
+    a.click();
+
+    a.remove();
+    window.URL.revokeObjectURL(url);
+
+    spinner.style.display = "none";
+});
 
 </script>
 

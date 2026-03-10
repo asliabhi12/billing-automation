@@ -38,6 +38,8 @@ def index():
             validated_files = []
 
             for file in files:
+                file.original_name = file.filename
+                file.filename = secure_filename(file.filename)
 
                 if file.filename == "":
                     continue
