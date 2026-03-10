@@ -1,6 +1,5 @@
 import pandas as pd
 from openpyxl import load_workbook
-from openpyxl.utils import get_column_letter
 from datetime import datetime
 from io import BytesIO
 
@@ -42,7 +41,7 @@ def process_files(files):
     def process_file(file_path, summary_data):
         file_path.seek(0)
 
-        df = pd.read_excel(file_path, sheet_name='Data')
+        df = pd.read_excel(file_path, sheet_name='Data', engine="openpyxl")
         
         # Rename the columns to match the desired format
         df.rename(columns={
@@ -57,7 +56,11 @@ def process_files(files):
         df_transformed = df[['Meter Name', 'Service Type', 'Resource Name', 'Region', 'Total Cost']].copy()
 
         # Ensure Total Cost is numeric
-        df_transformed['Total Cost'] = pd.to_numeric(df_transformed['Total Cost'], errors='coerce').fillna(0)
+        df_transformed["Total Cost"] = (
+        pd.to_numeric(df_transformed["Total Cost"], errors="coerce")
+        .fillna(0)
+        .astype("float32")
+         )
         
         # Add summary data to the DataFrame
         for col, val in summary_data.items():
@@ -88,7 +91,7 @@ def process_files(files):
 
     # Create a Pandas Excel writer object
     # output_file_path = 'output-file/transformed_data-2.xlsx'  # Replace with your desired output file path
-    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+    with pd.ExcelWriter(output, engine="openpyxl") as writer:
         for file in files:
             # Extract summary data
             summary_data = extract_summary_data(file)
@@ -105,21 +108,15 @@ def process_files(files):
             # Write the transformed data to a new sheet
             df_transformed.to_excel(writer, sheet_name=sheet_name, index=False)
             
-            # Access the workbook and worksheet
-            workbook = writer.book
-            worksheet = writer.sheets[sheet_name]
-
             # Autofit column widths
-            for column in worksheet.columns:
-                max_length = 0
-                column = [cell for cell in column]
-                for cell in column:
-                    try:
-                        if len(str(cell.value)) > max_length:
-                            max_length = len(str(cell.value))
-                    except:
-                        pass
-                adjusted_width = (max_length + 2)
-                worksheet.column_dimensions[get_column_letter(column[0].column)].width = adjusted_width
+    with pd.ExcelWriter(output, engine="openpyxl") as writer:
+        for file in files:
+            summary_data = extract_summary_data(file)
+            df_transformed = process_file(file, summary_data)
+
+            sheet_name = file.filename.replace('.xlsx', '')
+            sheet_name = sheet_name[:31].replace('/', '_').replace('\\', '_').replace('*', '_').replace('[', '_').replace(']', '_').replace(':', '_').replace('?', '_')
+
+            df_transformed.to_excel(writer, sheet_name=sheet_name, index=False)
     output.seek(0)
     return output
