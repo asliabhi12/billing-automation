@@ -2,6 +2,10 @@ from flask import Flask, render_template, request, send_file
 from processor import process_files
 from werkzeug.utils import secure_filename
 import uuid
+import tempfile
+from pdf_generator import generate_pdfs
+import os
+from zip_generator import create_zip
 
 app = Flask(__name__)
 
@@ -72,6 +76,55 @@ def index():
             return f"Error processing files: {str(e)}"
 
     return render_template("index.html")
+
+@app.route("/pdf", methods=["GET", "POST"])
+def pdf_page():
+
+    if request.method == "POST":
+
+        try:
+            file = request.files.get("file")
+
+            if not file or file.filename == "":
+                return "No file uploaded"
+
+            if not allowed_file(file.filename):
+                return "Only .xlsx files are allowed"
+
+            file.filename = secure_filename(file.filename)
+
+            with tempfile.TemporaryDirectory() as temp_dir:
+
+                excel_path = os.path.join(temp_dir, file.filename)
+                file.save(excel_path)
+
+                print("Excel received:", excel_path)
+
+                # STEP 1 → Generate PDFs
+                pdf_folder = os.path.join(temp_dir, "pdfs")
+                generate_pdfs(excel_path, pdf_folder)
+
+                print("PDFs generated")
+
+                # STEP 2 → Create ZIP (PDFs only)
+                zip_path = os.path.join(temp_dir, "pdfs.zip")
+
+                create_zip(None, pdf_folder, zip_path)
+
+                print("ZIP created")
+
+                return send_file(
+                    zip_path,
+                    as_attachment=True,
+                    download_name="pdf_reports.zip",
+                    mimetype="application/zip"
+                )
+
+        except Exception as e:
+            return f"Error: {str(e)}"
+
+    return render_template("pdf.html")
+
 
 
 if __name__ == "__main__":

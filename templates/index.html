@@ -6,13 +6,67 @@
 
 <style>
 
-body{
+
+
+body {
+    margin: 0;
+    overflow-x: hidden;
     font-family: Arial;
     background:#f5f6fa;
     text-align:center;
-    padding-top:80px;
+    padding-top:100px;
 }
 
+/* ===== NAVBAR ===== */
+
+/* ===== NAVBAR ===== */
+.navbar{
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;               /* 🔥 instead of width:100% */
+    
+    background:#2c3e50;
+    color:white;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    padding:15px 20px;     /* reduced padding */
+    box-sizing:border-box;
+
+    overflow:hidden;       /* 🔥 prevents spill */
+    z-index:1000;
+}
+
+/* Left */
+.nav-left{
+    font-size:18px;
+    font-weight:bold;
+    flex-shrink:0;         /* 🔥 prevents shrinking */
+}
+
+/* Right */
+.nav-right{
+    display:flex;
+    align-items:center;
+    gap:15px;
+    flex-shrink:0;         /* 🔥 prevents clipping */
+}
+
+/* Links */
+.nav-right a{
+    color:white;
+    text-decoration:none;
+    font-size:15px;
+    white-space:nowrap;
+}
+
+.nav-right a:hover{
+    color:#3498db;
+}
+/* ===== MAIN CONTAINER ===== */
 .container{
     background:white;
     width:500px;
@@ -56,6 +110,16 @@ button:hover{
 
 <body>
 
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar">
+    <div class="nav-left">Billing Tool</div>
+    <div class="nav-right">
+        <a href="/">Excel</a>
+        <a href="/pdf">PDF</a>
+    </div>
+</nav>
+
+<!-- ===== MAIN UI ===== -->
 <div class="container">
 
 <h2>Excel Billing Processor</h2>
